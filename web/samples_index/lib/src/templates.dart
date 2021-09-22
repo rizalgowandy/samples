@@ -7,9 +7,9 @@ import 'data.dart';
 import 'util.dart' as util;
 
 String _escapeAttribute(String s) =>
-    HtmlEscape(HtmlEscapeMode.attribute).convert(s);
+    const HtmlEscape(HtmlEscapeMode.attribute).convert(s);
 String _escapeElement(String s) =>
-    HtmlEscape(HtmlEscapeMode.element).convert(s);
+    const HtmlEscape(HtmlEscapeMode.element).convert(s);
 
 String description(Sample sample) => '''
 <!DOCTYPE html>
@@ -187,7 +187,7 @@ String _descriptionPage(Sample sample) => '''
 
 String _descriptionButtons(Sample sample) {
   var buf = StringBuffer();
-  if (sample?.web?.isNotEmpty == true) {
+  if (sample.web?.isNotEmpty == true) {
     buf.write(
         '''<button class="mdc-button mdc-button--outlined" onclick="window.location.href = '${sample.web}';"><span class="mdc-button__ripple"></span> Launch App</button>''');
   }

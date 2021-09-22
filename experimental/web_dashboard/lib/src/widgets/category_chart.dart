@@ -2,9 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:flutter/material.dart';
-
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../api/api.dart';
@@ -18,11 +17,12 @@ class CategoryChart extends StatelessWidget {
   final Category category;
   final DashboardApi api;
 
-  CategoryChart({
+  const CategoryChart({
     @required this.category,
     @required this.api,
   });
 
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -33,7 +33,7 @@ class CategoryChart extends StatelessWidget {
             children: [
               Text(category.name),
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   showDialog<EditCategoryDialog>(
                     context: context,
@@ -73,14 +73,14 @@ class CategoryChart extends StatelessWidget {
   }
 
   Widget _buildLoadingIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator());
   }
 }
 
 class _BarChart extends StatelessWidget {
   final List<Entry> entries;
 
-  _BarChart({this.entries});
+  const _BarChart({this.entries});
 
   @override
   Widget build(BuildContext context) {

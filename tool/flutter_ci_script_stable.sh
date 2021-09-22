@@ -5,6 +5,8 @@ set -e
 DIR="${BASH_SOURCE%/*}"
 source "$DIR/flutter_ci_script_shared.sh"
 
+flutter doctor -v
+
 declare -ar PROJECT_NAMES=(
     "add_to_app/books/flutter_module_books"
     "add_to_app/fullscreen/flutter_module"
@@ -15,6 +17,7 @@ declare -ar PROJECT_NAMES=(
     "experimental/desktop_photo_search"
     "experimental/federated_plugin/federated_plugin"
     "experimental/web_dashboard"
+    "experimental/linting_tool"
     "flutter_maps_firestore"
     "infinite_list"
     "ios_app_clip"

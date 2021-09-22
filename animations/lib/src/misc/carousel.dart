@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class CarouselDemo extends StatelessWidget {
+  CarouselDemo({Key? key}) : super(key: key);
   static String routeName = '/misc/carousel';
 
   static const List<String> fileNames = [
@@ -22,7 +23,7 @@ class CarouselDemo extends StatelessWidget {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carousel Demo'),
+        title: const Text('Carousel Demo'),
       ),
       body: Center(
         child: Padding(
