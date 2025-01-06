@@ -1,9 +1,7 @@
 # Veggie Seasons
 
-An iOS app that shows which fruits and vegetables are currently in season. It
+An iOS sample app that shows which fruits and vegetables are currently in season. It
 showcases Flutter's Cupertino package.
-
-[Available now in the App Store!](https://itunes.apple.com/is/app/veggie-seasons/id1450855435)
 
 **NOTE:** While Flutter supports many platforms, this application is designed
 specifically for iOS. It's not intended to be run on Android, web, or desktop.
@@ -21,13 +19,6 @@ specifically for iOS. It's not intended to be run on Android, web, or desktop.
 These are the screens presented in the app, roughly analogous to
 UIViewControllers. `HomeScreen` is the root, and the others are shown
 as the user navigates.
-
-### `/widgets/search_bar.dart`
-
-An example of how to construct an Cupertino-style search bar. The
-Flutter team [is working on an official widget](https://github.com/flutter/flutter/issues/9784)
-for this. Once that effort is complete, developers will not need to roll
-their own search bars, so to speak.
 
 ## Questions/issues
 

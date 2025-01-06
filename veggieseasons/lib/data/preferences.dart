@@ -4,19 +4,19 @@
 
 import 'dart:async';
 
-import 'package:scoped_model/scoped_model.dart';
-import 'package:veggieseasons/data/veggie.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'veggie.dart';
 
 /// A model class that mirrors the options in [SettingsScreen] and stores data
 /// in shared preferences.
-class Preferences extends Model {
+class Preferences extends ChangeNotifier {
   // Keys to use with shared preferences.
   static const _caloriesKey = 'calories';
   static const _preferredCategoriesKey = 'preferredCategories';
 
   // Indicates whether a call to [_loadFromSharedPrefs] is in progress;
-  Future<void> _loading;
+  Future<void>? _loading;
 
   int _desiredCalories = 2000;
 
@@ -50,6 +50,12 @@ class Preferences extends Model {
     notifyListeners();
   }
 
+  Future<void> restoreDefaults() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    load();
+  }
+
   void load() {
     _loading = _loadFromSharedPrefs();
   }
@@ -73,9 +79,7 @@ class Preferences extends Model {
     if (names != null && names.isNotEmpty) {
       for (final name in names.split(',')) {
         final index = int.tryParse(name) ?? -1;
-        if (VeggieCategory.values[index] != null) {
-          _preferredCategories.add(VeggieCategory.values[index]);
-        }
+        _preferredCategories.add(VeggieCategory.values[index]);
       }
     }
 

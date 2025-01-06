@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_shopper/models/cart.dart';
@@ -16,12 +15,12 @@ Widget createCatalogScreen() => MultiProvider(
         ChangeNotifierProxyProvider<CatalogModel, CartModel>(
           create: (context) => CartModel(),
           update: (context, catalog, cart) {
-            cart.catalog = catalog;
+            cart!.catalog = catalog;
             return cart;
           },
         ),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         home: MyCatalog(),
       ),
     );
@@ -48,7 +47,7 @@ void main() {
       expect(find.text('ADD'), findsWidgets);
 
       // Performing the click on the ADD button of the first item in the list.
-      await tester.tap(find.widgetWithText(FlatButton, 'ADD').first);
+      await tester.tap(find.widgetWithText(TextButton, 'ADD').first);
       await tester.pumpAndSettle();
 
       // Verifying if the tapped ADD button has changed to the check icon.

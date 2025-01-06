@@ -10,9 +10,10 @@ class SignInPage extends StatelessWidget {
   final Auth auth;
   final ValueChanged<User> onSuccess;
 
-  SignInPage({
-    @required this.auth,
-    @required this.onSuccess,
+  const SignInPage({
+    required this.auth,
+    required this.onSuccess,
+    super.key,
   });
 
   @override
@@ -29,17 +30,18 @@ class SignInButton extends StatefulWidget {
   final Auth auth;
   final ValueChanged<User> onSuccess;
 
-  SignInButton({
-    @required this.auth,
-    @required this.onSuccess,
+  const SignInButton({
+    required this.auth,
+    required this.onSuccess,
+    super.key,
   });
 
   @override
-  _SignInButtonState createState() => _SignInButtonState();
+  State<SignInButton> createState() => _SignInButtonState();
 }
 
 class _SignInButtonState extends State<SignInButton> {
-  Future<bool> _checkSignInFuture;
+  Future<bool>? _checkSignInFuture;
 
   @override
   void initState() {
@@ -78,7 +80,7 @@ class _SignInButtonState extends State<SignInButton> {
         var alreadySignedIn = snapshot.data;
         if (snapshot.connectionState != ConnectionState.done ||
             alreadySignedIn == true) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         // If sign in failed, show toast and the login button
@@ -86,8 +88,8 @@ class _SignInButtonState extends State<SignInButton> {
           _showError();
         }
 
-        return RaisedButton(
-          child: Text('Sign In with Google'),
+        return FilledButton(
+          child: const Text('Sign In with Google'),
           onPressed: () => _signIn(),
         );
       },
@@ -95,8 +97,8 @@ class _SignInButtonState extends State<SignInButton> {
   }
 
   void _showError() {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
         content: Text('Unable to sign in.'),
       ),
     );

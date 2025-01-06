@@ -1,6 +1,12 @@
 name: tool
 publish_to: none
 
+environment:
+  sdk: ^3.5.0
+
 dependencies:
-  markdown: ^2.0.3
-  path: ^1.6.2
+  markdown: ^7.0.0
+  path: ^1.8.0
+
+dev_dependencies:
+  lints: ^5.0.0

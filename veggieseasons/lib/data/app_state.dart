@@ -2,43 +2,50 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:scoped_model/scoped_model.dart';
-import 'package:veggieseasons/data/veggie.dart';
-import 'package:veggieseasons/data/local_veggie_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'local_veggie_provider.dart';
+import 'veggie.dart';
 
-class AppState extends Model {
+class AppState extends ChangeNotifier {
   final List<Veggie> _veggies;
 
   AppState() : _veggies = LocalVeggieProvider.veggies;
 
   List<Veggie> get allVeggies => List<Veggie>.from(_veggies);
 
-  Veggie getVeggie(int id) => _veggies.singleWhere((v) => v.id == id);
-
   List<Veggie> get availableVeggies {
     var currentSeason = _getSeasonForDate(DateTime.now());
     return _veggies.where((v) => v.seasons.contains(currentSeason)).toList();
   }
+
+  List<Veggie> get favoriteVeggies =>
+      _veggies.where((v) => v.isFavorite).toList();
 
   List<Veggie> get unavailableVeggies {
     var currentSeason = _getSeasonForDate(DateTime.now());
     return _veggies.where((v) => !v.seasons.contains(currentSeason)).toList();
   }
 
-  List<Veggie> get favoriteVeggies =>
-      _veggies.where((v) => v.isFavorite).toList();
+  Veggie getVeggie(int? id) => _veggies.singleWhere((v) => v.id == id);
 
-  List<Veggie> searchVeggies(String terms) => _veggies
-      .where((v) => v.name.toLowerCase().contains(terms.toLowerCase()))
+  List<Veggie> searchVeggies(String? terms) => _veggies
+      .where((v) => v.name.toLowerCase().contains(terms!.toLowerCase()))
       .toList();
 
-  void setFavorite(int id, bool isFavorite) {
+  void setFavorite(int? id, bool isFavorite) {
     var veggie = getVeggie(id);
     veggie.isFavorite = isFavorite;
     notifyListeners();
   }
 
-  static Season _getSeasonForDate(DateTime date) {
+  /// Used in tests to set the season independent of the current date.
+  static Season? debugCurrentSeason;
+
+  static Season? _getSeasonForDate(DateTime date) {
+    if (debugCurrentSeason != null) {
+      return debugCurrentSeason;
+    }
+
     // Technically the start and end dates of seasons can vary by a day or so,
     // but this is close enough for produce.
     switch (date.month) {

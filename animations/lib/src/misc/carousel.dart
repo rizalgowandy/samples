@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 
 class CarouselDemo extends StatelessWidget {
-  static String routeName = '/misc/carousel';
+  CarouselDemo({super.key});
+  static String routeName = 'misc/carousel';
 
   static const List<String> fileNames = [
     'assets/eat_cape_town_sm.jpg',
@@ -22,7 +22,7 @@ class CarouselDemo extends StatelessWidget {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carousel Demo'),
+        title: const Text('Carousel Demo'),
       ),
       body: Center(
         child: Padding(
@@ -46,15 +46,15 @@ typedef OnCurrentItemChangedCallback = void Function(int currentItem);
 class Carousel extends StatefulWidget {
   final IndexedWidgetBuilder itemBuilder;
 
-  const Carousel({Key key, @required this.itemBuilder});
+  const Carousel({super.key, required this.itemBuilder});
 
   @override
-  _CarouselState createState() => _CarouselState();
+  State<Carousel> createState() => _CarouselState();
 }
 
 class _CarouselState extends State<Carousel> {
-  PageController _controller;
-  int _currentPage;
+  late final PageController _controller;
+  late int _currentPage;
   bool _pageHasChanged = false;
 
   @override
@@ -78,14 +78,20 @@ class _CarouselState extends State<Carousel> {
         });
       },
       controller: _controller,
+      scrollBehavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: {
+          ui.PointerDeviceKind.touch,
+          ui.PointerDeviceKind.mouse,
+        },
+      ),
       itemBuilder: (context, index) => AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          var result = _pageHasChanged ? _controller.page : _currentPage * 1.0;
+          var result = _pageHasChanged ? _controller.page! : _currentPage * 1.0;
 
           // The horizontal position of the page between a 1 and 0
           var value = result - index;
-          value = (1 - (value.abs() * .5)).clamp(0.0, 1.0) as double;
+          value = (1 - (value.abs() * .5)).clamp(0.0, 1.0);
 
           return Center(
             child: SizedBox(

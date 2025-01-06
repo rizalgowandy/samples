@@ -8,7 +8,8 @@ directories:
 - github_dataviz/web
 - particle_background/web
 - slide_puzzle/web
-- timeflow/web
-- vision_challenge/web
+- form_app/web
+- web_dashboard/web
+- place_tracker/web
 
 post-build-dart-script: _tool/peanut_post_build.dart

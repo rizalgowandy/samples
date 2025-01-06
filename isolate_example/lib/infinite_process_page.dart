@@ -19,16 +19,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class InfiniteProcessPageStarter extends StatelessWidget {
+  const InfiniteProcessPageStarter({super.key});
+
   @override
   Widget build(context) {
     return ChangeNotifierProvider(
       create: (context) => InfiniteProcessIsolateController(),
-      child: InfiniteProcessPage(),
+      child: const InfiniteProcessPage(),
     );
   }
 }
 
 class InfiniteProcessPage extends StatelessWidget {
+  const InfiniteProcessPage({super.key});
+
   @override
   Widget build(context) {
     final controller = Provider.of<InfiniteProcessIsolateController>(context);
@@ -41,29 +45,33 @@ class InfiniteProcessPage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'Summation Results',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          Expanded(
+          const Expanded(
             child: RunningList(),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: [
-                  RaisedButton(
-                    child: const Text('Start'),
-                    elevation: 8.0,
-                    onPressed: () => controller.start(),
-                  ),
-                  RaisedButton(
-                    child: const Text('Terminate'),
-                    elevation: 8.0,
-                    onPressed: () => controller.terminate(),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: OverflowBar(
+                  spacing: 8.0,
+                  alignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(elevation: 8.0),
+                      onPressed: () => controller.start(),
+                      child: const Text('Start'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(elevation: 8.0),
+                      onPressed: () => controller.terminate(),
+                      child: const Text('Terminate'),
+                    ),
+                  ],
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +84,7 @@ class InfiniteProcessPage extends StatelessWidget {
                     inactiveTrackColor: Colors.deepOrangeAccent,
                     inactiveThumbColor: Colors.black,
                   ),
-                  Text('Pause/Resume'),
+                  const Text('Pause/Resume'),
                 ],
               ),
               Row(
@@ -86,7 +94,7 @@ class InfiniteProcessPage extends StatelessWidget {
                     Radio<int>(
                       value: i,
                       groupValue: controller.currentMultiplier,
-                      onChanged: (val) => controller.setMultiplier(val),
+                      onChanged: (val) => controller.setMultiplier(val!),
                     ),
                     Text('${i}x')
                   ],
@@ -101,10 +109,10 @@ class InfiniteProcessPage extends StatelessWidget {
 }
 
 class InfiniteProcessIsolateController extends ChangeNotifier {
-  Isolate newIsolate;
-  ReceivePort receivePort;
-  SendPort newIceSP;
-  Capability capability;
+  Isolate? newIsolate;
+  late ReceivePort receivePort;
+  late SendPort newIceSP;
+  Capability? capability;
 
   int _currentMultiplier = 1;
   final List<int> _currentResults = [];
@@ -127,11 +135,12 @@ class InfiniteProcessIsolateController extends ChangeNotifier {
 
   void listen() {
     receivePort.listen((dynamic message) {
-      if (message is SendPort) {
-        newIceSP = message;
-        newIceSP.send(_currentMultiplier);
-      } else if (message is int) {
-        setCurrentResults(message);
+      switch (message) {
+        case SendPort():
+          newIceSP = message;
+          newIceSP.send(_currentMultiplier);
+        case int():
+          setCurrentResults(message);
       }
     });
   }
@@ -146,17 +155,17 @@ class InfiniteProcessIsolateController extends ChangeNotifier {
   }
 
   void terminate() {
-    newIsolate.kill();
+    newIsolate?.kill();
     _created = false;
     _currentResults.clear();
     notifyListeners();
   }
 
   void pausedSwitch() {
-    if (_paused) {
-      newIsolate.resume(capability);
+    if (_paused && capability != null) {
+      newIsolate?.resume(capability!);
     } else {
-      capability = newIsolate.pause();
+      capability = newIsolate?.pause();
     }
 
     _paused = !_paused;
@@ -183,6 +192,8 @@ class InfiniteProcessIsolateController extends ChangeNotifier {
 }
 
 class RunningList extends StatelessWidget {
+  const RunningList({super.key});
+
   @override
   Widget build(context) {
     final controller = Provider.of<InfiniteProcessIsolateController>(context);
@@ -199,15 +210,15 @@ class RunningList extends StatelessWidget {
           return Column(
             children: [
               Card(
+                color: (controller.created && !controller.paused)
+                    ? Colors.lightGreenAccent
+                    : Colors.deepOrangeAccent,
                 child: ListTile(
                   leading: Text('${sums.length - index}.'),
                   title: Text('${sums[index]}.'),
                 ),
-                color: (controller.created && !controller.paused)
-                    ? Colors.lightGreenAccent
-                    : Colors.deepOrangeAccent,
               ),
-              Divider(
+              const Divider(
                 color: Colors.blue,
                 height: 3,
               ),

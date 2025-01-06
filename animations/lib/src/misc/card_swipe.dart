@@ -2,20 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
 class CardSwipeDemo extends StatefulWidget {
-  static String routeName = '/misc/card_swipe';
+  const CardSwipeDemo({super.key});
+  static String routeName = 'misc/card_swipe';
 
   @override
-  _CardSwipeDemoState createState() => _CardSwipeDemoState();
+  State<CardSwipeDemo> createState() => _CardSwipeDemoState();
 }
 
 class _CardSwipeDemoState extends State<CardSwipeDemo> {
-  List<String> fileNames;
+  late List<String> fileNames;
 
   @override
   void initState() {
@@ -35,18 +34,17 @@ class _CardSwipeDemoState extends State<CardSwipeDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Card Swipe'),
+        title: const Text('Card Swipe'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Center(
           child: Column(
-            children: <Widget>[
+            children: [
               Expanded(
                 child: ClipRect(
                   child: Stack(
-                    overflow: Overflow.clip,
-                    children: <Widget>[
+                    children: [
                       for (final fileName in fileNames)
                         SwipeableCard(
                           imageAssetName: fileName,
@@ -60,7 +58,7 @@ class _CardSwipeDemoState extends State<CardSwipeDemo> {
                   ),
                 ),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: const Text('Refill'),
                 onPressed: () {
                   setState(() {
@@ -79,7 +77,7 @@ class _CardSwipeDemoState extends State<CardSwipeDemo> {
 class Card extends StatelessWidget {
   final String imageAssetName;
 
-  Card(this.imageAssetName);
+  const Card({required this.imageAssetName, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -102,20 +100,18 @@ class SwipeableCard extends StatefulWidget {
   final String imageAssetName;
   final VoidCallback onSwiped;
 
-  SwipeableCard({
-    this.onSwiped,
-    this.imageAssetName,
-  });
+  const SwipeableCard(
+      {required this.onSwiped, required this.imageAssetName, super.key});
 
   @override
-  _SwipeableCardState createState() => _SwipeableCardState();
+  State<SwipeableCard> createState() => _SwipeableCardState();
 }
 
 class _SwipeableCardState extends State<SwipeableCard>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<Offset> _animation;
-  double _dragStartX;
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+  late double _dragStartX;
   bool _isSwipingLeft = false;
 
   @override
@@ -124,7 +120,7 @@ class _SwipeableCardState extends State<SwipeableCard>
     _controller = AnimationController.unbounded(vsync: this);
     _animation = _controller.drive(Tween<Offset>(
       begin: Offset.zero,
-      end: Offset(1, 0),
+      end: const Offset(1, 0),
     ));
   }
 
@@ -136,7 +132,7 @@ class _SwipeableCardState extends State<SwipeableCard>
         onHorizontalDragStart: _dragStart,
         onHorizontalDragUpdate: _dragUpdate,
         onHorizontalDragEnd: _dragEnd,
-        child: Card(widget.imageAssetName),
+        child: Card(imageAssetName: widget.imageAssetName),
       ),
     );
   }
@@ -156,30 +152,42 @@ class _SwipeableCardState extends State<SwipeableCard>
     }
 
     setState(() {
+      final size = context.size;
+
+      if (size == null) {
+        return;
+      }
+
       // Calculate the amount dragged in unit coordinates (between 0 and 1)
       // using this widgets width.
       _controller.value =
-          (details.localPosition.dx - _dragStartX).abs() / context.size.width;
+          (details.localPosition.dx - _dragStartX).abs() / size.width;
     });
   }
 
   /// Runs the fling / spring animation using the final velocity of the drag
   /// gesture.
   void _dragEnd(DragEndDetails details) {
-    var velocity =
-        (details.velocity.pixelsPerSecond.dx / context.size.width).abs();
+    final size = context.size;
+
+    if (size == null) {
+      return;
+    }
+
+    var velocity = (details.velocity.pixelsPerSecond.dx / size.width).abs();
     _animate(velocity: velocity);
   }
 
   void _updateAnimation(double dragPosition) {
     _animation = _controller.drive(Tween<Offset>(
       begin: Offset.zero,
-      end: _isSwipingLeft ? Offset(-1, 0) : Offset(1, 0),
+      end: _isSwipingLeft ? const Offset(-1, 0) : const Offset(1, 0),
     ));
   }
 
   void _animate({double velocity = 0}) {
-    var description = SpringDescription(mass: 50, stiffness: 1, damping: 1);
+    var description =
+        const SpringDescription(mass: 50, stiffness: 1, damping: 1);
     var simulation =
         SpringSimulation(description, _controller.value, 1, velocity);
     _controller.animateWith(simulation).then<void>((_) {

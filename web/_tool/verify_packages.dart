@@ -5,15 +5,13 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+
 import 'common.dart';
 
-const _ansiGreen = 32;
-const _ansiRed = 31;
-const _ansiMagenta = 35;
-
 void main() async {
-  final packageDirs = _listPackageDirs(Directory.current)
+  final packageDirs = listPackageDirs(Directory.current)
       .map((path) => p.relative(path, from: Directory.current.path))
+      .where((path) => !p.dirname(path).startsWith('_'))
       .toList();
 
   print('Package dirs:\n${packageDirs.map((path) => '  $path').join('\n')}');
@@ -21,17 +19,25 @@ void main() async {
   final results = <bool>[];
   for (var i = 0; i < packageDirs.length; i++) {
     final dir = packageDirs[i];
-    logWrapped(_ansiMagenta, '\n$dir (${i + 1} of ${packageDirs.length})');
-    results.add(await run(dir, 'flutter', [
+    logWrapped(ansiMagenta, '\n$dir (${i + 1} of ${packageDirs.length})');
+
+    final upgradeResult = await run(dir, 'flutter', [
       'pub',
       'pub',
       'upgrade',
       '--no-precompile',
-    ]));
+    ]);
+
+    results.add(upgradeResult);
+    if (!upgradeResult) {
+      // skipping analyze when `pub upgrade` fails.
+      results.add(false);
+      continue;
+    }
     results.add(await run(
       dir,
-      'dartanalyzer',
-      ['--fatal-infos', '--fatal-warnings', '.'],
+      'dart',
+      ['analyze', '--fatal-infos', '--fatal-warnings', '.'],
     ));
     _printStatus(results);
   }
@@ -46,19 +52,6 @@ void _printStatus(List<bool> results) {
   var success = (successCount == results.length);
   var pct = 100 * successCount / results.length;
 
-  logWrapped(success ? _ansiGreen : _ansiRed,
+  logWrapped(success ? ansiGreen : ansiRed,
       '$successCount of ${results.length} (${pct.toStringAsFixed(2)}%)');
-}
-
-Iterable<String> _listPackageDirs(Directory dir) sync* {
-  if (File('${dir.path}/pubspec.yaml').existsSync()) {
-    yield dir.path;
-  } else {
-    for (var subDir in dir
-        .listSync(followLinks: true)
-        .whereType<Directory>()
-        .where((d) => !Uri.file(d.path).pathSegments.last.startsWith('.'))) {
-      yield* _listPackageDirs(subDir);
-    }
-  }
 }

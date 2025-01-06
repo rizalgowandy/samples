@@ -20,16 +20,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DataTransferPageStarter extends StatelessWidget {
+  const DataTransferPageStarter({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => DataTransferIsolateController(),
-      child: DataTransferPage(),
+      child: const DataTransferPage(),
     );
   }
 }
 
 class DataTransferPage extends StatelessWidget {
+  const DataTransferPage({super.key});
+
   @override
   Widget build(context) {
     final controller = Provider.of<DataTransferIsolateController>(context);
@@ -39,41 +43,50 @@ class DataTransferPage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
+            padding: const EdgeInsets.all(8),
             child: Text(
               'Number Generator Progress',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            padding: EdgeInsets.all(8),
           ),
           LinearProgressIndicator(
             value: controller.progressPercent,
             backgroundColor: Colors.grey[200],
           ),
-          Expanded(
+          const Expanded(
             child: RunningList(),
           ),
           Column(
             children: [
-              RaisedButton(
-                child: const Text('Transfer Data to 2nd Isolate'),
-                color: (controller.runningTest == 1)
-                    ? Colors.blueAccent
-                    : Colors.grey[300],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: switch (controller.runningTest) {
+                    1 => Colors.blueAccent,
+                    _ => Colors.blueGrey,
+                  },
+                ),
                 onPressed: () => controller.generateRandomNumbers(false),
+                child: const Text('Transfer Data to 2nd Isolate'),
               ),
-              RaisedButton(
-                child: const Text('Transfer Data with TransferableTypedData'),
-                color: (controller.runningTest == 2)
-                    ? Colors.blueAccent
-                    : Colors.grey[300],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: switch (controller.runningTest) {
+                    2 => Colors.blueAccent,
+                    _ => Colors.blueGrey,
+                  },
+                ),
                 onPressed: () => controller.generateRandomNumbers(true),
+                child: const Text('Transfer Data with TransferableTypedData'),
               ),
-              RaisedButton(
-                child: const Text('Generate on 2nd Isolate'),
-                color: (controller.runningTest == 3)
-                    ? Colors.blueAccent
-                    : Colors.grey[300],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: switch (controller.runningTest) {
+                    3 => Colors.blueAccent,
+                    _ => Colors.blueGrey,
+                  },
+                ),
                 onPressed: controller.generateOnSecondaryIsolate,
+                child: const Text('Generate on 2nd Isolate'),
               ),
             ],
           ),
@@ -84,16 +97,14 @@ class DataTransferPage extends StatelessWidget {
 }
 
 class DataTransferIsolateController extends ChangeNotifier {
-  Isolate _isolate;
-  ReceivePort _incomingReceivePort;
-  SendPort _outgoingSendPort;
+  Isolate? _isolate;
+  late ReceivePort _incomingReceivePort;
+  late SendPort _outgoingSendPort;
 
   final currentProgress = <String>[];
   int runningTest = 0;
   Stopwatch _timer = Stopwatch();
   double progressPercent = 0;
-
-  Isolate get newIsolate => _isolate;
 
   bool get running => runningTest != 0;
 
@@ -110,19 +121,16 @@ class DataTransferIsolateController extends ChangeNotifier {
 
   void listen() {
     _incomingReceivePort.listen((dynamic message) {
-      if (message is SendPort) {
-        _outgoingSendPort = message;
-      }
-
-      if (message is int) {
-        currentProgress.insert(
-            0, '$message% - ${_timer.elapsedMilliseconds / 1000} seconds');
-        progressPercent = message / 100;
-      }
-
-      if (message is String && message == 'done') {
-        runningTest = 0;
-        _timer.stop();
+      switch (message) {
+        case SendPort():
+          _outgoingSendPort = message;
+        case int():
+          currentProgress.insert(
+              0, '$message% - ${_timer.elapsedMilliseconds / 1000} seconds');
+          progressPercent = message / 100;
+        case 'done':
+          runningTest = 0;
+          _timer.stop();
       }
 
       notifyListeners();
@@ -192,6 +200,8 @@ class DataTransferIsolateController extends ChangeNotifier {
 }
 
 class RunningList extends StatelessWidget {
+  const RunningList({super.key});
+
   @override
   Widget build(BuildContext context) {
     final progress =
@@ -207,12 +217,12 @@ class RunningList extends StatelessWidget {
           return Column(
             children: [
               Card(
+                color: Colors.lightGreenAccent,
                 child: ListTile(
                   title: Text(progress[index]),
                 ),
-                color: Colors.lightGreenAccent,
               ),
-              Divider(
+              const Divider(
                 color: Colors.blue,
                 height: 3,
               ),
@@ -259,7 +269,7 @@ Iterable<int> createNums() sync* {
   }
 }
 
-Future<void> generateAndSum(
+Future<int> generateAndSum(
   SendPort callerSP,
   Iterable<int> iter,
   int length,

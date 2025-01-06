@@ -3,61 +3,72 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AnimatedListDemo extends StatefulWidget {
-  static String routeName = '/misc/animated_list';
+  const AnimatedListDemo({super.key});
+  static String routeName = 'misc/animated_list';
 
   @override
-  _AnimatedListDemoState createState() => _AnimatedListDemoState();
+  State<AnimatedListDemo> createState() => _AnimatedListDemoState();
 }
 
 class _AnimatedListDemoState extends State<AnimatedListDemo> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  final listData = initialListData;
+  final listData = [
+    UserModel(0, 'Govind', 'Dixit'),
+    UserModel(1, 'Greta', 'Stoll'),
+    UserModel(2, 'Monty', 'Carlo'),
+    UserModel(3, 'Petey', 'Cruiser'),
+    UserModel(4, 'Barry', 'Cade'),
+  ];
+  final initialListSize = 5;
 
   void addUser() {
     setState(() {
       var index = listData.length;
       listData.add(
-        UserModel(firstName: 'New', lastName: 'Person'),
+        UserModel(++_maxIdValue, 'New', 'Person'),
       );
-      _listKey.currentState
-          .insertItem(index, duration: Duration(milliseconds: 300));
+      _listKey.currentState!
+          .insertItem(index, duration: const Duration(milliseconds: 300));
     });
   }
 
-  void deleteUser(int index) {
+  void deleteUser(int id) {
     setState(() {
+      final index = listData.indexWhere((u) => u.id == id);
       var user = listData.removeAt(index);
-      _listKey.currentState.removeItem(
+      _listKey.currentState!.removeItem(
         index,
         (context, animation) {
           return FadeTransition(
-            opacity:
-                CurvedAnimation(parent: animation, curve: Interval(0.5, 1.0)),
+            opacity: CurvedAnimation(
+                parent: animation, curve: const Interval(0.5, 1.0)),
             child: SizeTransition(
-              sizeFactor:
-                  CurvedAnimation(parent: animation, curve: Interval(0.0, 1.0)),
+              sizeFactor: CurvedAnimation(
+                  parent: animation, curve: const Interval(0.0, 1.0)),
               axisAlignment: 0.0,
               child: _buildItem(user),
             ),
           );
         },
-        duration: Duration(milliseconds: 600),
+        duration: const Duration(milliseconds: 600),
       );
     });
   }
 
-  Widget _buildItem(UserModel user, [int index]) {
+  Widget _buildItem(UserModel user) {
     return ListTile(
       key: ValueKey<UserModel>(user),
       title: Text(user.firstName),
       subtitle: Text(user.lastName),
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
         child: Icon(Icons.person),
       ),
-      onLongPress: () => deleteUser(index),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () => deleteUser(user.id),
+      ),
     );
   }
 
@@ -65,9 +76,10 @@ class _AnimatedListDemoState extends State<AnimatedListDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
+        title: const Text('AnimatedList'),
+        actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: addUser,
           ),
         ],
@@ -75,11 +87,11 @@ class _AnimatedListDemoState extends State<AnimatedListDemo> {
       body: SafeArea(
         child: AnimatedList(
           key: _listKey,
-          initialItemCount: initialListData.length,
+          initialItemCount: 5,
           itemBuilder: (context, index, animation) {
             return FadeTransition(
               opacity: animation,
-              child: _buildItem(listData[index], index),
+              child: _buildItem(listData[index]),
             );
           },
         ),
@@ -89,31 +101,15 @@ class _AnimatedListDemoState extends State<AnimatedListDemo> {
 }
 
 class UserModel {
-  const UserModel({this.firstName, this.lastName});
+  UserModel(
+    this.id,
+    this.firstName,
+    this.lastName,
+  );
 
+  final int id;
   final String firstName;
   final String lastName;
 }
 
-List<UserModel> initialListData = [
-  UserModel(
-    firstName: 'Govind',
-    lastName: 'Dixit',
-  ),
-  UserModel(
-    firstName: 'Greta',
-    lastName: 'Stoll',
-  ),
-  UserModel(
-    firstName: 'Monty',
-    lastName: 'Carlo',
-  ),
-  UserModel(
-    firstName: 'Petey',
-    lastName: 'Cruiser',
-  ),
-  UserModel(
-    firstName: 'Barry',
-    lastName: 'Cade',
-  ),
-];
+int _maxIdValue = 4;

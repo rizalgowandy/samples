@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+
 import 'api_key.dart';
 
 // Center of the Google Map
@@ -16,16 +19,22 @@ const _pinkHue = 350.0;
 // Places API client used for Place Photos
 final _placesApiClient = GoogleMapsPlaces(apiKey: googleMapsApiKey);
 
-void main() => runApp(App());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ice Creams FTW',
       home: const HomePage(title: 'Ice Cream Stores in SF'),
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        colorSchemeSeed: Colors.pink,
         scaffoldBackgroundColor: Colors.pink[50],
       ),
     );
@@ -33,8 +42,7 @@ class App extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({@required this.title});
-
+  const HomePage({required this.title, super.key});
   final String title;
 
   @override
@@ -44,13 +52,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Stream<QuerySnapshot> _iceCreamStores;
+  late Stream<QuerySnapshot> _iceCreamStores;
   final Completer<GoogleMapController> _mapController = Completer();
 
   @override
   void initState() {
     super.initState();
-    _iceCreamStores = Firestore.instance
+    _iceCreamStores = FirebaseFirestore.instance
         .collection('ice_cream_stores')
         .orderBy('name')
         .snapshots();
@@ -65,26 +73,25 @@ class _HomePageState extends State<HomePage> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _iceCreamStores,
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData) {
-            return Center(child: const Text('Loading...'));
-          }
-
-          return Stack(
-            children: [
-              StoreMap(
-                documents: snapshot.data.documents,
-                initialPosition: initialPosition,
-                mapController: _mapController,
-              ),
-              StoreCarousel(
-                mapController: _mapController,
-                documents: snapshot.data.documents,
-              ),
-            ],
-          );
+          return switch (snapshot) {
+            AsyncSnapshot(hasError: true) =>
+              Center(child: Text('Error: ${snapshot.error}')),
+            AsyncSnapshot(hasData: false) =>
+              const Center(child: Text('Loading...')),
+            _ => Stack(
+                children: [
+                  StoreMap(
+                    documents: snapshot.data!.docs,
+                    initialPosition: initialPosition,
+                    mapController: _mapController,
+                  ),
+                  StoreCarousel(
+                    mapController: _mapController,
+                    documents: snapshot.data!.docs,
+                  ),
+                ],
+              )
+          };
         },
       ),
     );
@@ -93,10 +100,10 @@ class _HomePageState extends State<HomePage> {
 
 class StoreCarousel extends StatelessWidget {
   const StoreCarousel({
-    Key key,
-    @required this.documents,
-    @required this.mapController,
-  }) : super(key: key);
+    super.key,
+    required this.documents,
+    required this.mapController,
+  });
 
   final List<DocumentSnapshot> documents;
   final Completer<GoogleMapController> mapController;
@@ -121,10 +128,10 @@ class StoreCarousel extends StatelessWidget {
 
 class StoreCarouselList extends StatelessWidget {
   const StoreCarouselList({
-    Key key,
-    @required this.documents,
-    @required this.mapController,
-  }) : super(key: key);
+    super.key,
+    required this.documents,
+    required this.mapController,
+  });
 
   final List<DocumentSnapshot> documents;
   final Completer<GoogleMapController> mapController;
@@ -156,10 +163,10 @@ class StoreCarouselList extends StatelessWidget {
 
 class StoreListTile extends StatefulWidget {
   const StoreListTile({
-    Key key,
-    @required this.document,
-    @required this.mapController,
-  }) : super(key: key);
+    super.key,
+    required this.document,
+    required this.mapController,
+  });
 
   final DocumentSnapshot document;
   final Completer<GoogleMapController> mapController;
@@ -204,7 +211,7 @@ class _StoreListTileState extends State<StoreListTile> {
     return ListTile(
       title: Text(widget.document['name'] as String),
       subtitle: Text(widget.document['address'] as String),
-      leading: Container(
+      leading: SizedBox(
         width: 100,
         height: 100,
         child: _placePhotoUrl.isNotEmpty
@@ -234,11 +241,11 @@ class _StoreListTileState extends State<StoreListTile> {
 
 class StoreMap extends StatelessWidget {
   const StoreMap({
-    Key key,
-    @required this.documents,
-    @required this.initialPosition,
-    @required this.mapController,
-  }) : super(key: key);
+    super.key,
+    required this.documents,
+    required this.initialPosition,
+    required this.mapController,
+  });
 
   final List<DocumentSnapshot> documents;
   final LatLng initialPosition;
@@ -260,8 +267,8 @@ class StoreMap extends StatelessWidget {
                   document['location'].longitude as double,
                 ),
                 infoWindow: InfoWindow(
-                  title: document['name'] as String,
-                  snippet: document['address'] as String,
+                  title: document['name'] as String?,
+                  snippet: document['address'] as String?,
                 ),
               ))
           .toSet(),

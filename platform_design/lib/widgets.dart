@@ -1,31 +1,33 @@
-import 'package:flutter/foundation.dart';
+// Copyright 2020 The Flutter team. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// A simple widget that builds different things on different platforms.
 class PlatformWidget extends StatelessWidget {
   const PlatformWidget({
-    Key key,
-    @required this.androidBuilder,
-    @required this.iosBuilder,
-  })  : assert(androidBuilder != null),
-        assert(iosBuilder != null),
-        super(key: key);
+    super.key,
+    required this.androidBuilder,
+    required this.iosBuilder,
+  });
 
   final WidgetBuilder androidBuilder;
   final WidgetBuilder iosBuilder;
 
   @override
   Widget build(context) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return androidBuilder(context);
-      case TargetPlatform.iOS:
-        return iosBuilder(context);
-      default:
-        assert(false, 'Unexpected platform $defaultTargetPlatform');
-        return null;
-    }
+    assert(
+        defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS,
+        'Unexpected platform $defaultTargetPlatform');
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android => androidBuilder(context),
+      TargetPlatform.iOS => iosBuilder(context),
+      _ => const SizedBox.shrink()
+    };
   }
 }
 
@@ -36,15 +38,16 @@ class PlatformWidget extends StatelessWidget {
 class PressableCard extends StatefulWidget {
   const PressableCard({
     this.onPressed,
-    this.color,
-    this.flattenAnimation,
+    required this.color,
+    required this.flattenAnimation,
     this.child,
+    super.key,
   });
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color color;
   final Animation<double> flattenAnimation;
-  final Widget child;
+  final Widget? child;
 
   @override
   State<StatefulWidget> createState() => _PressableCardState();
@@ -53,8 +56,8 @@ class PressableCard extends StatefulWidget {
 class _PressableCardState extends State<PressableCard>
     with SingleTickerProviderStateMixin {
   bool pressed = false;
-  AnimationController controller;
-  Animation<double> elevationAnimation;
+  late final AnimationController controller;
+  late final Animation<double> elevationAnimation;
 
   @override
   void initState() {
@@ -89,9 +92,7 @@ class _PressableCardState extends State<PressableCard>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          if (widget.onPressed != null) {
-            widget.onPressed();
-          }
+          widget.onPressed?.call();
         },
         // This widget both internally drives an animation when pressed and
         // responds to an external animation to flatten the card when in a
@@ -107,8 +108,9 @@ class _PressableCardState extends State<PressableCard>
               // in your own app.
               scale: 1 - elevationAnimation.value * 0.03,
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16) *
-                    flatten,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16) *
+                        flatten,
                 child: PhysicalModel(
                   elevation:
                       ((1 - elevationAnimation.value) * 10 + 10) * flatten,
@@ -134,13 +136,18 @@ class _PressableCardState extends State<PressableCard>
 /// This is an example of a custom widget that an app developer might create for
 /// use on both iOS and Android as part of their brand's unique design.
 class HeroAnimatingSongCard extends StatelessWidget {
-  HeroAnimatingSongCard(
-      {this.song, this.color, this.heroAnimation, this.onPressed});
+  const HeroAnimatingSongCard({
+    required this.song,
+    required this.color,
+    required this.heroAnimation,
+    this.onPressed,
+    super.key,
+  });
 
   final String song;
   final Color color;
   final Animation<double> heroAnimation;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   double get playButtonSize => 50 + 50 * heroAnimation.value;
 
@@ -173,10 +180,10 @@ class HeroAnimatingSongCard extends StatelessWidget {
                     height: 80,
                     color: Colors.black12,
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       song,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w500,
                       ),
@@ -185,12 +192,12 @@ class HeroAnimatingSongCard extends StatelessWidget {
                 ),
                 // The play button grows in the hero animation.
                 Padding(
-                  padding:
-                      EdgeInsets.only(bottom: 45) * (1 - heroAnimation.value),
+                  padding: const EdgeInsets.only(bottom: 45) *
+                      (1 - heroAnimation.value),
                   child: Container(
                     height: playButtonSize,
                     width: playButtonSize,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.black12,
                     ),
@@ -213,19 +220,21 @@ class HeroAnimatingSongCard extends StatelessWidget {
 /// This is an example of a custom widget that an app developer might create for
 /// use on both iOS and Android as part of their brand's unique design.
 class SongPlaceholderTile extends StatelessWidget {
+  const SongPlaceholderTile({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 95,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         child: Row(
           children: [
             Container(
-              color: Theme.of(context).textTheme.bodyText2.color,
+              color: Theme.of(context).textTheme.bodyMedium!.color,
               width: 130,
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 12),
             ),
             Expanded(
@@ -234,28 +243,28 @@ class SongPlaceholderTile extends StatelessWidget {
                 children: [
                   Container(
                     height: 9,
-                    margin: EdgeInsets.only(right: 60),
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    margin: const EdgeInsets.only(right: 60),
+                    color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),
                   Container(
                     height: 9,
-                    margin: EdgeInsets.only(right: 20, top: 8),
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    margin: const EdgeInsets.only(right: 20, top: 8),
+                    color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),
                   Container(
                     height: 9,
-                    margin: EdgeInsets.only(right: 40, top: 8),
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    margin: const EdgeInsets.only(right: 40, top: 8),
+                    color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),
                   Container(
                     height: 9,
-                    margin: EdgeInsets.only(right: 80, top: 8),
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    margin: const EdgeInsets.only(right: 80, top: 8),
+                    color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),
                   Container(
                     height: 9,
-                    margin: EdgeInsets.only(right: 50, top: 8),
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    margin: const EdgeInsets.only(right: 50, top: 8),
+                    color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),
                 ],
               ),
@@ -283,20 +292,19 @@ void showChoices(BuildContext context, List<String> choices) {
       showDialog<void>(
         context: context,
         builder: (context) {
-          var selectedRadio = 1;
+          int? selectedRadio = 1;
           return AlertDialog(
-            contentPadding: EdgeInsets.only(top: 12),
+            contentPadding: const EdgeInsets.only(top: 12),
             content: StatefulBuilder(
               builder: (context, setState) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: List<Widget>.generate(choices.length, (index) {
-                    return RadioListTile(
+                    return RadioListTile<int?>(
                       title: Text(choices[index]),
                       value: index,
                       groupValue: selectedRadio,
-                      // ignore: avoid_types_on_closure_parameters
-                      onChanged: (int value) {
+                      onChanged: (value) {
                         setState(() => selectedRadio = value);
                       },
                     );
@@ -305,12 +313,12 @@ void showChoices(BuildContext context, List<String> choices) {
               },
             ),
             actions: [
-              FlatButton(
-                child: Text('OK'),
+              TextButton(
+                child: const Text('OK'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              FlatButton(
-                child: Text('CANCEL'),
+              TextButton(
+                child: const Text('CANCEL'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -334,7 +342,7 @@ void showChoices(BuildContext context, List<String> choices) {
                 return Center(
                   child: Text(
                     choices[index],
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 21,
                     ),
                   ),

@@ -3,182 +3,121 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:veggieseasons/data/veggie.dart';
+import 'data/veggie.dart';
 
 abstract class Styles {
-  static TextStyle headlineText(CupertinoThemeData themeData) => TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 32,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.bold,
-      );
-
-  static const minorText = TextStyle(
-    color: Color.fromRGBO(128, 128, 128, 1),
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.normal,
-  );
-
-  static TextStyle headlineName(CupertinoThemeData themeData) => TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 24,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.bold,
-      );
-
-  static TextStyle headlineDescription(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
+  static CupertinoThemeData veggieThemeData = const CupertinoThemeData(
+    textTheme: CupertinoTextThemeData(
+      textStyle: TextStyle(
+        color: CupertinoColors.label,
         fontSize: 16,
-        fontStyle: FontStyle.normal,
         fontWeight: FontWeight.normal,
+        fontStyle: FontStyle.normal,
+        fontFamily: 'CupertinoSystemText',
+        letterSpacing: -0.41,
+        decoration: TextDecoration.none,
+      ),
+    ),
+  );
+
+  static TextStyle headlineText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
       );
 
-  static const cardTitleText = TextStyle(
-    color: Color.fromRGBO(0, 0, 0, 0.9),
-    fontFamily: 'NotoSans',
-    fontSize: 32,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.bold,
-  );
+  static TextStyle minorText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(128, 128, 128, 1),
+      );
 
-  static const cardCategoryText = TextStyle(
-    color: Color.fromRGBO(255, 255, 255, 0.9),
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.normal,
-  );
+  static TextStyle headlineName(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      );
 
-  static const cardDescriptionText = TextStyle(
-    color: Color.fromRGBO(0, 0, 0, 0.9),
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.normal,
-  );
+  static TextStyle cardTitleText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(0, 0, 0, 0.9),
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+      );
 
-  static TextStyle detailsTitleText(CupertinoThemeData themeData) => TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
+  static TextStyle cardCategoryText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(255, 255, 255, 0.9),
+      );
+
+  static TextStyle cardDescriptionText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(0, 0, 0, 0.9),
+      );
+
+  static TextStyle detailsTitleText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
         fontSize: 30,
-        fontStyle: FontStyle.normal,
         fontWeight: FontWeight.bold,
       );
 
   static TextStyle detailsPreferredCategoryText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
+      themeData.textTheme.textStyle.copyWith(
         fontWeight: FontWeight.bold,
       );
 
-  static TextStyle detailsCategoryText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
+  static TextStyle detailsBoldDescriptionText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(0, 0, 0, 0.9),
+        fontWeight: FontWeight.bold,
       );
 
-  static TextStyle detailsDescriptionText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
+  static TextStyle detailsServingHeaderText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color.fromRGBO(176, 176, 176, 1),
+        fontWeight: FontWeight.bold,
       );
-
-  static const detailsBoldDescriptionText = TextStyle(
-    color: Color.fromRGBO(0, 0, 0, 0.9),
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const detailsServingHeaderText = TextStyle(
-    color: Color.fromRGBO(176, 176, 176, 1),
-    fontFamily: 'NotoSans',
-    fontSize: 16,
-    fontStyle: FontStyle.normal,
-    fontWeight: FontWeight.bold,
-  );
 
   static TextStyle detailsServingLabelText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
+      themeData.textTheme.textStyle.copyWith(
         fontWeight: FontWeight.bold,
-      );
-
-  static TextStyle detailsServingValueText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
       );
 
   static TextStyle detailsServingNoteText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
+      themeData.textTheme.textStyle.copyWith(
         fontStyle: FontStyle.italic,
-        fontWeight: FontWeight.normal,
       );
 
   static TextStyle triviaFinishedTitleText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
+      themeData.textTheme.textStyle.copyWith(
         fontSize: 32,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
-      );
-
-  static TextStyle triviaFinishedText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 16,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
       );
 
   static TextStyle triviaFinishedBigText(CupertinoThemeData themeData) =>
-      TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
+      themeData.textTheme.textStyle.copyWith(
         fontSize: 48,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
+      );
+
+  static TextStyle settingsGroupHeaderText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: CupertinoColors.inactiveGray,
+        fontSize: 13.5,
+        letterSpacing: -0.5,
+      );
+
+  static TextStyle settingsGroupFooterText(CupertinoThemeData themeData) =>
+      themeData.textTheme.textStyle.copyWith(
+        color: const Color(0xff777777),
+        fontSize: 13,
+        letterSpacing: -0.08,
       );
 
   static const appBackground = Color(0xffd0d0d0);
 
-  static Color scaffoldBackground(Brightness brightness) =>
+  static Color? scaffoldBackground(Brightness brightness) =>
       brightness == Brightness.light
-          ? CupertinoColors.lightBackgroundGray
+          ? CupertinoColors.extraLightBackgroundGray
           : null;
-
-  static Color searchBackground(CupertinoThemeData themeData) =>
-      themeData.barBackgroundColor;
 
   static const frostedBackground = Color(0xccf8f8f8);
 
@@ -186,22 +125,10 @@ abstract class Styles {
 
   static const closeButtonPressed = Color(0xff808080);
 
-  static TextStyle searchText(CupertinoThemeData themeData) => TextStyle(
-        color: themeData.textTheme.textStyle.color,
-        fontFamily: 'NotoSans',
-        fontSize: 14,
-        fontStyle: FontStyle.normal,
-        fontWeight: FontWeight.normal,
-      );
-
-  static TextStyle settingsItemText(CupertinoThemeData themeData) =>
-      themeData.textTheme.textStyle;
-
   static TextStyle settingsItemSubtitleText(CupertinoThemeData themeData) =>
-      TextStyle(
+      themeData.textTheme.textStyle.copyWith(
         fontSize: 12,
         letterSpacing: -0.2,
-        color: themeData.textTheme.textStyle.color,
       );
 
   static const Color searchCursorColor = Color.fromRGBO(0, 122, 255, 1);
@@ -270,18 +197,20 @@ abstract class Styles {
           : CupertinoColors.darkBackgroundGray;
 
   static Color settingsLineation(Brightness brightness) =>
-      brightness == Brightness.light ? Color(0xffbcbbc1) : Color(0xFF4C4B4B);
+      brightness == Brightness.light
+          ? const Color(0xffbcbbc1)
+          : const Color(0xff4c4b4b);
 
   static const Color settingsBackground = Color(0xffefeff4);
 
-  static const Color settingsGroupSubtitle = Color(0xff777777);
-
-  static const Color iconBlue = Color(0xff0000ff);
-
-  static const Color iconGold = Color(0xffdba800);
-
   static const preferenceIcon = IconData(
     0xf443,
+    fontFamily: CupertinoIcons.iconFont,
+    fontPackage: CupertinoIcons.iconFontPackage,
+  );
+
+  static const resetIcon = IconData(
+    0xf4c4,
     fontFamily: CupertinoIcons.iconFont,
     fontPackage: CupertinoIcons.iconFontPackage,
   );
@@ -292,15 +221,9 @@ abstract class Styles {
     fontPackage: CupertinoIcons.iconFontPackage,
   );
 
-  static const checkIcon = IconData(
-    0xf383,
-    fontFamily: CupertinoIcons.iconFont,
-    fontPackage: CupertinoIcons.iconFontPackage,
-  );
-
   static const servingInfoBorderColor = Color(0xffb0b0b0);
 
   static const ColorFilter desaturatedColorFilter =
       // 222222 is a random color that has low color saturation.
-      ColorFilter.mode(Color(0xFF222222), BlendMode.saturation);
+      ColorFilter.mode(Color(0xff222222), BlendMode.saturation);
 }

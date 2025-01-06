@@ -3,45 +3,76 @@
 // found in the LICENSE file.
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
-import 'package:veggieseasons/screens/favorites.dart';
-import 'package:veggieseasons/screens/list.dart';
-import 'package:veggieseasons/screens/search.dart';
-import 'package:veggieseasons/screens/settings.dart';
+import 'package:go_router/go_router.dart';
+
+const _bottomNavigationBarItemIconPadding = EdgeInsets.only(top: 4.0);
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({
+    super.key,
+    this.restorationId,
+    required this.child,
+    required this.onTap,
+  });
+
+  final String? restorationId;
+  final Widget child;
+  final void Function(int) onTap;
+
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(items: [
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.home),
-          title: Text('Home'),
+    final index = _getSelectedIndex(GoRouter.of(context).location);
+    return RestorationScope(
+      restorationId: restorationId,
+      child: CupertinoPageScaffold(
+        child: Column(
+          children: [
+            Expanded(child: child),
+            CupertinoTabBar(
+              currentIndex: index,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: _bottomNavigationBarItemIconPadding,
+                    child: Icon(CupertinoIcons.home),
+                  ),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: _bottomNavigationBarItemIconPadding,
+                    child: Icon(CupertinoIcons.book),
+                  ),
+                  label: 'My Garden',
+                ),
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: _bottomNavigationBarItemIconPadding,
+                    child: Icon(CupertinoIcons.search),
+                  ),
+                  label: 'Search',
+                ),
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: _bottomNavigationBarItemIconPadding,
+                    child: Icon(CupertinoIcons.settings),
+                  ),
+                  label: 'Settings',
+                ),
+              ],
+              onTap: onTap,
+            ),
+          ],
         ),
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.book),
-          title: Text('My Garden'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.search),
-          title: Text('Search'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.settings),
-          title: Text('Settings'),
-        ),
-      ]),
-      tabBuilder: (context, index) {
-        if (index == 0) {
-          return ListScreen();
-        } else if (index == 1) {
-          return FavoritesScreen();
-        } else if (index == 2) {
-          return SearchScreen();
-        } else {
-          return SettingsScreen();
-        }
-      },
+      ),
     );
+  }
+
+  int _getSelectedIndex(String location) {
+    if (location.startsWith('/list')) return 0;
+    if (location.startsWith('/favorites')) return 1;
+    if (location.startsWith('/search')) return 2;
+    if (location.startsWith('/settings')) return 3;
+    return 0;
   }
 }
